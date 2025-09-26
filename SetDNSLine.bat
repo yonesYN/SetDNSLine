@@ -59,7 +59,7 @@ FOR /F "tokens=* USEBACKQ" %%F IN (`ping %dns1% -n 1 -w 1000`) DO (SET ping=%%F)
 COLOR B
 CLS
 SET "ping=%ping:,="& rem %
-IF "%ping:~,1%" == "M" (ECHO %name% %adns:N=%		%ping:Minimum =Ping%
+IF "%ping:~,1%" == "M" (ECHO %name%: %adns:N=%		%ping:Minimum =Ping%
 GOTO D)
 ECHO [96m%name%: %adns%		Ping=[31mTimeout[96m
 
@@ -117,4 +117,5 @@ GOTO M
 :ERROR
 ECHO [31mconfig.txt not exist
 timeout 6 >nul
+
 exit
