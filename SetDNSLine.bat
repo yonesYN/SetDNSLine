@@ -81,8 +81,9 @@ echo %lin% | findstr /r "[0-9]" >nul
 if %errorlevel% equ 0 (
 	GOTO SET
 ) else (
-	GOTO S
 	IF %lin%==d (GOTO DHCP)
+	IF %lin%==D (GOTO DHCP)
+	GOTO S
 )
 
 :SET
@@ -111,11 +112,12 @@ GOTO M
 
 :DHCP
 CLS
-netsh interface ipv4 set dnsservers name="%inter%" source=dhcp >nul
+ECHO Loading...
+netsh interface ipv4 set dnsservers name="%ap%" source=dhcp >nul && COLOR A || COLOR 4
+ipconfig /flushdns >nul
 GOTO M
 
 :ERROR
 ECHO [31mconfig.txt not exist
 timeout 6 >nul
-
 exit
