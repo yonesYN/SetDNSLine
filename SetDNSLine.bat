@@ -73,7 +73,7 @@ for /f "skip=1 tokens=1 delims=:" %%a in ('findstr /r "[0-9].[0-9]" "config.txt"
     set /a count+=1
     echo [!count!] %%a
 )
-
+set "dns="
 SET "lin=a"
 SET /p lin=type :
 
@@ -91,6 +91,7 @@ for /f "skip=%lin% tokens=2 delims=:" %%a in ('findstr /r "[0-9].[0-9]" "config.
 	set "dns=%%~a"
 	GOTO NE
 )
+if not defined dns ( GOTO I )
 :NE
 SET "dns=%dns: =%"
 SET "dns=%dns:	=%"
