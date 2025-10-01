@@ -83,7 +83,7 @@ if %errorlevel% equ 0 (
 ) else (
 	IF %lin%==d (GOTO DHCP)
 	IF %lin%==D (GOTO DHCP)
-	GOTO S
+	GOTO I
 )
 
 :SET
