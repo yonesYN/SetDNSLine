@@ -1,3 +1,4 @@
+:: github.com/yonesYN/SetDNSLine
 @ECHO OFF
 TITLE "Set DNS Line"
 MODE con: cols=83 lines=19
@@ -137,3 +138,4 @@ GOTO M
 ECHO [31mconfig.txt not exist
 timeout 6 >NUL
 EXIT
+
