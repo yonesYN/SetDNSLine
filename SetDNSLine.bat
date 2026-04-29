@@ -1,7 +1,7 @@
 :: github.com/yonesYN/SetDNSLine
 @ECHO OFF
 TITLE "Set DNS Line"
-MODE con: cols=83 lines=19
+MODE con: cols=83 lines=18
 SETLOCAL ENABLEDELAYEDEXPANSION
 WHOAMI /GROUPS | findstr "S-1-16-12288" >NUL && GOTO S
 SET "params=%*"
@@ -24,8 +24,7 @@ FOR /F "tokens=3*" %%a in ('netsh interface show interface ^| findstr /c:"Connec
 )
 
 IF !ct!==0 (
-    echo No connected interfaces found
-	color 4
+    echo [31mNo connected interfaces found
     pause
     exit
 )
@@ -59,21 +58,19 @@ SET "adns=%adns:N=%"
 SET "dns1=%adns:,=" & SET "dns2=%"
 
 SET "name="
-SET "pattern=:[ 	]*'%dns1%"
+SET "pattern=[ 	]*'%dns1%"
 IF DEFINED dns2 (
-	FOR /F "delims=" %%a in ('findstr /r /c:"%pattern%" "config.txt" ^| findstr "%dns2%"') do (
+	FOR /F "tokens=1*" %%a in ('findstr /r /c:"%pattern%" "config.txt" ^| findstr "%dns2%"') do (
 		set "name=%%a"
 		GOTO N
 	)
 )
-FOR /F "delims=" %%a in ('findstr /r /c:"%pattern%" "config.txt" ^| findstr /v ","') do (
+FOR /F "tokens=1*" %%a in ('findstr /r /c:"%pattern%" "config.txt" ^| findstr /v ","') do (
 	set "name=%%a"
 	GOTO N
 )
 :N
-IF DEFINED name (
-SET "name=%name::=" & rem %
-)ELSE (SET "name=DNS")
+if not defined name (SET "name=DNS")
 
 FOR /F "tokens=9" %%F in ('ping -n 1 -w 1000 %dns1% ^| find "Minimum ="') do (SET ping=%%F)
 COLOR B
@@ -87,15 +84,16 @@ IF "%adns%"=="N" (ECHO DNS: [31mNone[96m)
 ECHO Interface: %ap%
 ECHO:
 SET "ct="
-FOR /F "skip=1 tokens=1 delims=:" %%a in ('findstr /r "[0-9].[0-9]" "config.txt"') do (
+FOR /F "tokens=1*" %%a in ('findstr /r "[0-9].[0-9]" "config.txt"') do (
     set /a ct+=1
+    SET "dns!ct!=%%b"
     echo [!ct!] %%a
 )
 ECHO:
 ECHO [D] Defualt DNS   [S] Select Interface
 SET "dns="
 SET "lin=a"
-SET /p lin=type :
+SET /p lin="Type: "
 
 ECHO %lin% | findstr /r "[0-9]" >NUL && GOTO SET
 IF /I "%lin%"=="D" (GOTO DHCP)
@@ -103,26 +101,14 @@ IF /I "%lin%"=="S" (GOTO SEL)
 GOTO I
 
 :SET
-FOR /F "skip=%lin% tokens=2 delims=:" %%a in ('findstr /r "[0-9].[0-9]" "config.txt"') do (
-	set "dns=%%a"
-	GOTO NE
-)
+SET "dns=!dns%lin%!"
 if not defined dns (GOTO I)
-:NE
+
 SET "dns=%dns: =%"
 SET "dns=%dns:	=%"
 CLS
 COLOR 6
 ECHO Loading...
-ECHO:
-ECHO Y88b   d88P 888b    888
-ECHO  Y88b d88P  8888b   888
-ECHO   Y88o88P   88888b  888
-ECHO    Y888P    888Y88b 888
-ECHO     888     888 Y88b888
-ECHO     888     888  Y88888
-ECHO     888     888   Y8888
-ECHO     888     888    Y888
 powershell -NoProfile -Command "Set-DnsClientServerAddress -InterfaceAlias '%ap%' -ServerAddresses (%dns%)" >NUL && COLOR A || COLOR 4
 ipconfig /flushdns >NUL
 GOTO M
@@ -138,4 +124,3 @@ GOTO M
 ECHO [31mconfig.txt not exist
 timeout 6 >NUL
 EXIT
-
